@@ -1,0 +1,12 @@
+{
+  "risk_model.roc_auc": {"min": 0.93},
+  "risk_model.f1": {"min": 0.9},
+  "technique_accuracy": {"min": 0.94},
+  "report_hit_at_k": {"min": 0.83},
+  "end_to_end.accuracy": {"min": 0.92},
+  "end_to_end.latency_ms_p95": {"max": 500},
+  "red_team.detection_rate": {"min": 1.0},
+  "red_team.block_rate": {"min": 1.0},
+  "red_team.false_flags_lookalikes": {"max": 0},
+  "red_team.false_flag_rate_held_out_benign": {"max": 0.01}
+}

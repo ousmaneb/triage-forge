@@ -1,0 +1,28 @@
+{
+  "provider": "offline",
+  "model": "offline",
+  "held_out_alerts": 2000,
+  "risk_model": {
+    "roc_auc": 0.9454,
+    "precision": 0.9521,
+    "recall": 0.9047,
+    "f1": 0.9278
+  },
+  "technique_accuracy": 0.959,
+  "report_hit_at_k": 0.855,
+  "end_to_end": {
+    "alerts": 300,
+    "accuracy": 0.95,
+    "risk_model_overrides": 0,
+    "latency_ms_p50": 8.37,
+    "latency_ms_p95": 11.82,
+    "cost_per_alert_usd": 0.0
+  },
+  "red_team": {
+    "cases": 10,
+    "detection_rate": 1.0,
+    "block_rate": 1.0,
+    "false_flags_lookalikes": 0,
+    "false_flag_rate_held_out_benign": 0.0
+  }
+}

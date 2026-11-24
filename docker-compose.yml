@@ -1,0 +1,40 @@
+services:
+  api:
+    build: .
+    ports: ["8080:8080"]
+    env_file: [.env]
+    environment:
+      SPLUNK_HEC_URL: https://splunk:8088
+      SPLUNK_VERIFY_TLS: "false"
+    volumes: ["audit:/app/audit"]
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    ports: ["9090:9090"]
+    volumes: ["./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    ports: ["3000:3000"]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ops/grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+  # Splunk Enterprise (60-day trial license). Start with: docker compose --profile splunk up
+  splunk:
+    image: splunk/splunk:9.4
+    platform: linux/amd64
+    profiles: ["splunk"]
+    ports: ["8000:8000", "8088:8088"]
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_GENERAL_TERMS: --accept-sgt-current-at-splunk-com
+      SPLUNK_PASSWORD: ${SPLUNK_PASSWORD:?set SPLUNK_PASSWORD in .env}
+      SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN:?set SPLUNK_HEC_TOKEN in .env}
+    volumes: ["./ops/splunk/apps/triage_forge:/opt/splunk/etc/apps/triage_forge"]
+
+volumes:
+  audit:

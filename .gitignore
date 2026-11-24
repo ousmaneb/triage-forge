@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.egg-info/
+models/
+audit/
+.env
+deploy/terraform/.terraform/
+deploy/terraform/*.tfstate*
+deploy/terraform/.terraform.lock.hcl
+.ruff_cache/
+.pytest_cache/

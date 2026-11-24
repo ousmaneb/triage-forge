@@ -1,0 +1,12 @@
+{
+  "id": "ex-ps-1",
+  "rule_name": "Suspicious PowerShell Execution",
+  "timestamp": "2026-03-02T02:14:00Z",
+  "host": "fin-ws-12",
+  "user": "adm_jsmith",
+  "privileged_user": true,
+  "process": "powershell.exe",
+  "parent_process": "winword.exe",
+  "command_line": "powershell.exe -nop -w hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkA",
+  "description": "PowerShell launched with obfuscated arguments"
+}

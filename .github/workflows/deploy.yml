@@ -1,0 +1,63 @@
+name: deploy
+
+# Runs on version tags or by hand. Needs the AWS resources from deploy/terraform and these
+# repository settings: secret AWS_DEPLOY_ROLE_ARN, variables AWS_REGION and SERVICE_URL.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency: deploy
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    env:
+      TF_LLM_PROVIDER: offline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]" && python -m triage_forge.cli train
+      - run: pytest -q && python eval/run_eval.py --gate
+
+  deploy:
+    needs: gate
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push
+        id: image
+        run: |
+          image="${{ steps.ecr.outputs.registry }}/triage-forge:${GITHUB_SHA::12}"
+          docker build -t "$image" .
+          docker push "$image"
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+      - name: Render task definition
+        run: aws ecs describe-task-definition --task-definition triage-forge --query taskDefinition > task.json
+      - id: task
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task.json
+          container-name: api
+          image: ${{ steps.image.outputs.image }}
+      - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task.outputs.task-definition }}
+          service: triage-forge
+          cluster: triage-forge
+          wait-for-service-stability: true
+      - name: Smoke test
+        run: curl -fs "${{ vars.SERVICE_URL }}/health"

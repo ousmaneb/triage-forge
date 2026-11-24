@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "triage-forge"
+version = "0.1.0"
+description = "AI alert triage for Splunk and Microsoft Sentinel: a risk model, ATT&CK technique classifier, RAG over threat reports, and Claude, with an evaluation gate."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=1.0",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "pydantic>=2.7",
+    "scikit-learn>=1.5",
+    "numpy>=1.26",
+    "joblib>=1.4",
+    "httpx>=0.27",
+    "prometheus-client>=0.20",
+]
+
+[project.optional-dependencies]
+otel = [
+    "opentelemetry-sdk>=1.25",
+    "opentelemetry-exporter-otlp>=1.25",
+    "opentelemetry-instrumentation-fastapi>=0.46b0",
+]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+triage-forge = "triage_forge.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["UP031"]

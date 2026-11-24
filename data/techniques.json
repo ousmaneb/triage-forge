@@ -1,0 +1,34 @@
+{
+  "T1059.001": {
+    "name": "Command and Scripting Interpreter: PowerShell",
+    "triage": "Decode any -enc payload. Malicious use usually has an Office or script-host parent, hidden windows, execution-policy bypass, or a download cradle. IT automation runs from known script paths under SCCM or explorer.exe."
+  },
+  "T1110": {
+    "name": "Brute Force",
+    "triage": "Compare the failure count with the user's baseline and check the source IP. Dozens to hundreds of failures from an external address, especially across several accounts, indicate guessing or spraying. A handful of internal failures is usually a mistyped or expired password."
+  },
+  "T1078": {
+    "name": "Valid Accounts",
+    "triage": "A successful sign-in from a new country or an impossible-travel pair is high risk when preceded by failures or tied to a privileged account. Check VPN egress and travel records before escalating."
+  },
+  "T1003.001": {
+    "name": "OS Credential Dumping: LSASS Memory",
+    "triage": "comsvcs.dll MiniDump, procdump -ma lsass, or taskmgr dumps of lsass are credential theft until proven otherwise. Defender scans and WerFault crash handling also touch LSASS and are benign."
+  },
+  "T1048": {
+    "name": "Exfiltration Over Alternative Protocol",
+    "triage": "rclone, curl uploads, or password-protected archives sent to external hosts suggest exfiltration. Nightly backups to internal backup servers and OneDrive sync are normal even at high volume."
+  },
+  "T1021.002": {
+    "name": "Remote Services: SMB/Windows Admin Shares",
+    "triage": "PsExec or WMIC fanning out to many hosts from a user workstation is lateral movement. Patch deployments from IT run under services.exe or SCCM and touch fewer hosts per minute."
+  },
+  "T1490": {
+    "name": "Inhibit System Recovery",
+    "triage": "Deleting shadow copies or disabling recovery is a common last step before ransomware encryption; isolate quickly. Listing or creating shadow copies is routine backup activity."
+  },
+  "T1053.005": {
+    "name": "Scheduled Task/Job: Scheduled Task",
+    "triage": "Tasks that run every few minutes, launch encoded PowerShell, or point at binaries in Public or Temp folders are persistence. Daily tasks pointing at IT script paths are usually maintenance."
+  }
+}

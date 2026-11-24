@@ -1,0 +1,55 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TF_LLM_PROVIDER: offline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests eval
+      - run: python -m triage_forge.cli train
+      - run: pytest -q
+      # Fails the build if any model, retrieval, red-team, or latency metric drops below eval/thresholds.json.
+      - name: Evaluation gate
+        run: python eval/run_eval.py --gate
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: eval/results.*
+
+  image:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t triage-forge:ci .
+      - name: Smoke test the image
+        run: |
+          docker run -d --name tf -p 8080:8080 -e TF_LLM_PROVIDER=offline triage-forge:ci
+          for i in $(seq 1 30); do curl -fs localhost:8080/health && break; sleep 1; done
+          curl -fs -X POST localhost:8080/triage -H 'content-type: application/json' \
+            -d @examples/alert-encoded-powershell.json | tee /dev/stderr | grep -q '"verdict"'
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

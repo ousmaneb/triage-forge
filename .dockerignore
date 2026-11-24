@@ -1,0 +1,8 @@
+.venv
+.git
+models
+audit
+eval/results*.json
+**/__pycache__
+.env
+deploy/terraform/.terraform

@@ -1,0 +1,16 @@
+{
+  "id": "ex-bk-1",
+  "rule_name": "Large Outbound Transfer",
+  "timestamp": "2026-03-02T23:40:00Z",
+  "host": "sql-prod-01",
+  "user": "svc_backup",
+  "privileged_user": true,
+  "host_criticality": 3,
+  "process": "veeam.exe",
+  "parent_process": "services.exe",
+  "command_line": "veeam.exe backup --job nightly-sql",
+  "description": "Outbound data volume well above this host's baseline",
+  "bytes_out": 18000000000,
+  "dst_ip": "10.0.3.20",
+  "distinct_destinations": 1
+}
